@@ -1,7 +1,7 @@
 ##
 ## For tagging the container:
 ##
-CNT_NAME := scimma/hopbeat
+CNT_NAME := scimma/hopbeat-monitor
 
 TAG      := $(shell git log -1 --pretty=%H || echo MISSING )
 CNT_IMG  := $(CNT_NAME):$(TAG)

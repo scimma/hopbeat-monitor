@@ -12,7 +12,7 @@ RUN cd /usr/local/src && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm -rf aws
-ADD scripts/hopveatMon /root/hopbeatMon
+ADD scripts/hopbeatMon /root/hopbeatMon
 ADD scripts/Utils.py       /root/Utils.py
 ADD scripts/runHopbeatMon.py /root/runHopbeaMont.py
 RUN chmod ugo+rx /root/hopBeatMon

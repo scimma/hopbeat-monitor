@@ -15,7 +15,7 @@ RUN cd /usr/local/src && \
 ADD scripts/hopbeatMon /root/hopbeatMon
 ADD scripts/Utils.py       /root/Utils.py
 ADD scripts/runHopbeatMon.py /root/runHopbeaMont.py
-RUN chmod ugo+rx /root/hopBeatMon
-RUN chmod ugo+rx /root/runHopBeatMon.py
+RUN chmod ugo+rx /root/hopbeatMon
+RUN chmod ugo+rx /root/runHopbeatMon.py
 WORKDIR /tmp
 #ENTRYPOINT ["/root/runHopBeat.py"]

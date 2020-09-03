@@ -27,9 +27,9 @@ u.writeConfig(Location, creds)
 
 while True:
     print("======================================")
-    print("== Starting hopBeatMon")
+    print("== Starting hopbeatMon")
     print("Date: %s" % datetime.now(pytz.timezone('America/New_York')))
     print("======================================")
-    exitVal = os.system("/root/hopBeatMon -F %s --scimma=%s" % (Location, hopUrl))
-    print("hopBeatMon exited with os.system returning: %d" % exitVal)
+    exitVal = os.system("/root/hopbeatMon -F %s --scimma=%s" % (Location, hopUrl))
+    print("hopbeatMon exited with os.system returning: %d" % exitVal)
     time.sleep(30)

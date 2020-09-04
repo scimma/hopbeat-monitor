@@ -18,4 +18,4 @@ ADD scripts/runHopbeatMon.py /root/runHopbeatMon.py
 RUN chmod ugo+rx /root/hopbeatMon
 RUN chmod ugo+rx /root/runHopbeatMon.py
 WORKDIR /tmp
-#ENTRYPOINT ["/root/runHopBeat.py"]
+ENTRYPOINT ["/root/runHopbeatMon.py"]

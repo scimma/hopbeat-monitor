@@ -11,7 +11,7 @@ REGION  := us-west-2
 AWSREG  := 585193511743.dkr.ecr.us-west-2.amazonaws.com
 MAJOR   := 0
 MINOR   := 0
-RELEASE := 5
+RELEASE := 6
 
 RELEASE_TAG := $(MAJOR).$(MINOR).$(RELEASE)
 
@@ -26,9 +26,6 @@ container: Dockerfile
 	docker build -f $< -t $(CNT_IMG) .
 	docker tag $(CNT_IMG) $(CNT_LTST)
 
-#test:
-#	cd test && SCIMMA_TEST_TAG=$(TAG) pytest -v
-
 set-release-tags:
 	@$(eval RELEASE_TAG := $(shell echo $(GITHUB_REF) | awk -F- '{print $$2}'))
 	@echo RELEASE_TAG =  $(RELEASE_TAG)
@@ -38,7 +35,7 @@ set-release-tags:
 	@echo MINOR_TAG = $(MINOR_TAG)
 
 push: 
-#	@(echo $(RELEASE_TAG) | grep -P '^[0-9]+\.[0-9]+\.[0-9]+$$' > /dev/null ) || (echo Bad release tag: $(RELEASE_TAG) && exit 1)
+	@(echo $(RELEASE_TAG) | grep -P '^[0-9]+\.[0-9]+\.[0-9]+$$' > /dev/null ) || (echo Bad release tag: $(RELEASE_TAG) && exit 1)
 	./bin/awsDockerLogin $(REGION) $(AWSREG) >/dev/null 2>/dev/null
 	docker tag $(CNT_IMG) $(AWSREG)/$(CNT_NAME):$(RELEASE_TAG)
 	docker tag $(CNT_IMG) $(AWSREG)/$(CNT_NAME):$(MAJOR)

@@ -1,4 +1,14 @@
 #!/usr/bin/python3
+###
+### Author: rdt12@psu.edu
+### Date: Sep 3, 2020
+### Desc: In a loop, connect to the HOP server and write metrics to the influx server.
+###       Metrics include:
+###
+###           time to run kafkacat
+###           hearbeats since last loop
+###           difference between hearbeat timestamp and now
+###
 from optparse import OptionParser
 import Utils as ut
 import HeartUtils as hu
@@ -14,7 +24,8 @@ sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', buffering=1)
 ##
 cHelp  = "SCiMMA client configuration file"
 sHelp  = "SCiMMA server URL"
-sUrl   = "kafka://dev.hop.scimma.org:9092/heartbeat"
+sUrl   = "dev.hop.scimma.org:9092"
+iUrl   = "http://influx.dev.hop.scimma.org:8010"
 p = OptionParser(usage="Usage: %prog [options]")
 p.add_option("",   "--scimma", dest="scimmaUrl", default=sUrl, help=sHelp)
 p.add_option("-F", "--config", dest="scimmaConfFile", default="~/shared/kafkacat.conf", help=cHelp)
@@ -22,45 +33,18 @@ p.add_option("-F", "--config", dest="scimmaConfFile", default="~/shared/kafkacat
 
 scimmaUrl      = o.scimmaUrl
 scimmaConfFile = os.path.expanduser(o.scimmaConfFile)
-
+influxUrl      = iUrl
+influxDb       = "hop"
 print("hopBeatMon starting")
 print("SCiMMA server URL:  %s"   % scimmaUrl)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
-q = multiprocessing.Queue()
-lp = multiProcessing.Process(target=hu.listen, args=(q))
-rp = multiProcessing.Process(target=hu.report, args=(q))
-
-lp.start()
-rp.start()
-
-ps = [lp, rp]
-
-##
-## Set signal handlers.
-##
-Terminate = False
-def handleTermSig (num, foo):
-     global ps
-     global Terminate
-     for p in ps:
-          p.JustDieAlready()
-     Terminate = True
-
-sig.signal(sig.SIGTERM, handleTermSig)
-sig.signal(sig.SIGINT,  handleTermSig)
-print("Signal handlers installed.")
-
-##
-## Wait for our inevitable death.
-##
-while not Terminate:
-    time.sleep(1)
-
-print("hopbeatMon: Exited main loop.")
-for p in ps:
-     print("hopbeatMon joining: %s" % p.name)
-     p.join()
-
-print("hopbeatMon: Exiting.")
+lastBeat = 0
+while (True):
+     ok, now, kafkaTime, curBeat, beatlag = hu.getStats(scimmaUrl)
+     if lastBeat > 0:
+          hu.writeStats(influxUrl, influxDb, ok, now, kafkaTime, lastBeat, curBeat, beatlag)
+     lastBeat = curBeat
+     print("Sleeping...")
+     time.sleep(60)
 exit(0)

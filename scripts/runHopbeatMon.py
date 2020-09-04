@@ -11,19 +11,22 @@ import pytz
 import sys
 import os
 
-region    = "us-west-2"
-secret    = "dev-gcn2hop-hopcreds"
-configDir = "/root/share"
-Location  = "%s/kafkacat.conf" % configDir
-hopUrl    = "kafka://dev.hop.scimma.org:9092/heartbeat"
+region       = "us-west-2"
+hopSecret    = "dev-gcn2hop-hopcreds"
+influxSecret = "dev-influxdb-hop-writer-creds" 
+configDir    = "/root/share"
+Location     = "%s/kafkacat.conf" % configDir
+hopUrl       = "dev.hop.scimma.org:9092"
 
 ## Line buffer stdout and stderr
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', buffering=1)
 
 os.system("mkdir -p %s" % configDir)
-creds  = u.getCreds(region, secret)
-u.writeConfig(Location, creds)
+hopCreds    = u.getCreds(region, hopSecret)
+influxCreds = u.getCredsString(region, influxSecret)
+u.writeConfig(Location, hopCreds)
+os.environ["INFLUX_CREDS"] = influxCreds
 
 while True:
     print("======================================")

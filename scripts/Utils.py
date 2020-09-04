@@ -23,6 +23,14 @@ def getCreds (region, secret):
       creds = None
   return creds
 
+def getCredsString (region, secret):
+  cmd   = "/usr/local/bin/aws --region %s secretsmanager get-secret-value --secret-id %s" % (region, secret)
+  s = json.loads(subprocess.Popen([cmd], shell=True,
+                             stdout=subprocess.PIPE).stdout.read().decode())
+  cjson = s["SecretString"]
+  c = json.loads(cjson)
+  return c["creds"]
+
 def writeConfig (loc, creds):
     cfh = open(loc, "w")
     cfh.write("security.protocol=SASL_SSL\n")

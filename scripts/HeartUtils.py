@@ -41,7 +41,7 @@ def writeStats (url, db, ok, now, ktime, lb, cb, bl):
     proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)
     iout = proc.stdout.decode().splitlines()
     ierr = proc.stderr.decode().splitlines()
-    if (proc.returncode() != 0):
+    if (proc.returncode != 0):
         print("============================")
         print("Error talking to influx.")
         print("============================")

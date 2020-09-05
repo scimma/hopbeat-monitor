@@ -6,7 +6,7 @@
 ###
 FROM scimma/client:0.2.0
 RUN  mkdir -p /usr/local/src
-RUN yum -y install git unzip
+RUN yum -y install git unzip pytz
 RUN cd /usr/local/src && \
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \

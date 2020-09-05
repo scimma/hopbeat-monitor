@@ -14,6 +14,7 @@ RUN cd /usr/local/src && \
     rm -rf aws
 ADD scripts/hopbeatMon /root/hopbeatMon
 ADD scripts/Utils.py       /root/Utils.py
+ADD scripts/HeartUtils.py /root/HeartUtils.py
 ADD scripts/runHopbeatMon.py /root/runHopbeatMon.py
 RUN chmod ugo+rx /root/hopbeatMon
 RUN chmod ugo+rx /root/runHopbeatMon.py

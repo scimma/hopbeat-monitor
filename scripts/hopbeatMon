@@ -42,7 +42,7 @@ print("SCiMMA config file: %s\n" % scimmaConfFile)
 lastBeat = 0
 while (True):
      ok, now, kafkaTime, curBeat, beatlag = hu.getStats(scimmaUrl)
-     if lastBeat > 0:
+     if ((lastBeat > 0) or (ok == 0)):
           hu.writeStats(influxUrl, influxDb, ok, now, kafkaTime, lastBeat, curBeat, beatlag)
      lastBeat = curBeat
      print("Sleeping...")

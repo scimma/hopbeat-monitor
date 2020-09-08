@@ -23,4 +23,3 @@ make push
 
 1. setup github CI
 2. modify the makefile to use environment variables from github CI to determine the versions/tags for pushing to AWS ECR.
-3. ``runHopBeatMon.py`` could be made more robust.

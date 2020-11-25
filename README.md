@@ -11,15 +11,16 @@ from the heartbeat topic on the HOP kafka server.
 make 
 ```
 
-## Push to Amazon ECS
+## Release
 
-This should only be done via github CI.
+Pushing to AWS ECR is handled via a github workflow. To push a container based on
+the current master branch to AWS ECR with
+version MAJOR.MINOR.RELEASE (e.g., "0.0.7") do:
 
 ```
-make push
+git tag version-MAJOR.MINOR.RELEASE
+git push origin version-MAJOR.MINOR.RELEASE
 ```
 
 ## TODO
 
-1. setup github CI
-2. modify the makefile to use environment variables from github CI to determine the versions/tags for pushing to AWS ECR.

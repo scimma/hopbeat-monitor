@@ -36,7 +36,7 @@ def writeConfig (loc, creds):
     cfh.write("security.protocol=SASL_SSL\n")
     cfh.write("sasl.username=%s\n" % creds["user"])
     cfh.write("sasl.password=%s\n" % creds["pass"])
-    cfh.write("sasl.mechanism=PLAIN\nssl.ca.location=/etc/pki/tls/certs/ca-bundle.trust.crt\n")
+    cfh.write("sasl.mechanism=SCRAM-SHA-512\nssl.ca.location=/etc/pki/tls/certs/ca-bundle.trust.crt\n")
     cfh.close()
 
 class ScimmaConnection:

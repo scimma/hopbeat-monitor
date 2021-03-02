@@ -24,7 +24,7 @@ def getStats (url):
     latestBeatTime = 0
     latestBeat     = 0
     for line in lines:
-        m = re.match('^\s*{\"timestamp\":\s+([0-9]+),\s+\"count\":\s+([0-9]+),', line)
+        m = re.match('^.*{\"timestamp\":\s+([0-9]+),\s+\"count\":\s+([0-9]+),', line)
         if m != None:
             curTime = int(m.group(1))
             curBeat = int(m.group(2))

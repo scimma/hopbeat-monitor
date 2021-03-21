@@ -19,32 +19,49 @@ import time
 ## Line buffer stdout and stderr
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', buffering=1)
+
 ##
 ## Parse options.
 ##
-cHelp  = "SCiMMA client configuration file"
-sHelp  = "SCiMMA server URL"
-sUrl   = "dev.hop.scimma.org:9092"
-iUrl   = "http://influx.dev.hop.scimma.org:8010"
+cHelp     = "SCiMMA client configuration file"
+sHelp     = "SCiMMA server URL"
+sUrl      = "dev.hop.scimma.org:9092"
+iUrl      = "http://influx.dev.hop.scimma.org:8010"
+topic     = "heartbeat"
+influxDb  = "hop"
+interval  = "30"
+
 p = OptionParser(usage="Usage: %prog [options]")
 p.add_option("",   "--scimma", dest="scimmaUrl", default=sUrl, help=sHelp)
 p.add_option("-F", "--config", dest="scimmaConfFile", default="~/shared/kafkacat.conf", help=cHelp)
 (o, a) = p.parse_args()
 
+if (os.environ.get('INFLUX_URL') is not None):
+    iUrl = os.environ.get('INFLUX_URL')
+
+if (os.environ.get('INFLUX_DB') is not None):
+    influxDb = os.environ.get('INFLUX_DB')
+
+if (os.environ.get('HOPBEAT_TOPIC') is not None):
+   topic = os.environ.get('HOPBEAT_TOPIC')
+
+if (os.environ.get('MONITOR_INTERVAL') is not None):
+    interval = os.environ.get('MONITOR_INTERVAL')
+
 scimmaUrl      = o.scimmaUrl
 scimmaConfFile = os.path.expanduser(o.scimmaConfFile)
 influxUrl      = iUrl
-influxDb       = "hop"
+
 print("hopBeatMon starting")
 print("SCiMMA server URL:  %s"   % scimmaUrl)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
 lastBeat = 0
 while (True):
-     ok, now, kafkaTime, curBeat, beatlag = hu.getStats(scimmaUrl)
+     ok, now, kafkaTime, curBeat, beatlag = hu.getStats(scimmaUrl, topic)
      if ((lastBeat > 0) or (ok == 0)):
           hu.writeStats(influxUrl, influxDb, ok, now, kafkaTime, lastBeat, curBeat, beatlag)
      lastBeat = curBeat
      print("Sleeping...")
-     time.sleep(60)
+     time.sleep(int(interval))
 exit(0)

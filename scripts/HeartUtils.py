@@ -6,10 +6,10 @@ import subprocess
 import time
 import re
 
-def getStats (url):
-    command = "/usr/local/bin/kafkacat -F /root/share/kafkacat.conf -b %s -C -t heartbeat -o -1 -e " % url
+def getStats (url, topic):
+    command = "/usr/local/bin/kafkacat -F /root/share/kafkacat.conf -b %s -C -t %s -o -1 -e " % (url, topic)
 #    startTime = time.time_ns()
-    startTime = int(time.time() * 1000000000)
+    startTime = int(time.time() * 10**9)
 
     try:
         proc = subprocess.run([command], shell=True, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE, timeout=20)
@@ -18,20 +18,20 @@ def getStats (url):
 
     lines = proc.stdout.decode().splitlines()
     endTimeFloat   = time.time()
-    endTime        = int(endTimeFloat * 1000000000)
+    endTime        = int(endTimeFloat * 10**9)
 #    endTime = time.time_ns()
-    endTimeSeconds = int(endTimeFloat)
+    endTimeMicroSeconds = int(endTimeFloat * 10**6)
     latestBeatTime = 0
     latestBeat     = 0
     for line in lines:
         m = re.match('^.*{\"timestamp\":\s+([0-9]+),\s+\"count\":\s+([0-9]+),', line)
         if m != None:
-            curTime = int(m.group(1))
+            curTime = int(m.group(1)) # in microseconds
             curBeat = int(m.group(2))
             if (curTime > latestBeatTime):
                 latestBeatTime = curTime
                 latestBeat     = curBeat
-    return [1, endTime, (endTime - startTime)/1000000000.0, latestBeat, endTimeSeconds - latestBeatTime]
+    return [1, endTime, (endTime - startTime)/float(10**9), latestBeat, endTimeMicroSeconds - latestBeatTime]
 
 def writeStats (url, db, ok, now, ktime, lb, cb, bl):
     if (ok == 1):

@@ -42,8 +42,8 @@ if (os.environ.get('INFLUX_URL') is not None):
 if (os.environ.get('INFLUX_DB') is not None):
     influxDb = os.environ.get('INFLUX_DB')
 
-if (os.environ.get('HOPBEAT_TOPIC') is not None):
-   topic = os.environ.get('HOPBEAT_TOPIC')
+if (os.environ.get('HOP_TOPIC') is not None):
+   topic = os.environ.get('HOP_TOPIC')
 
 if (os.environ.get('MONITOR_INTERVAL') is not None):
     interval = os.environ.get('MONITOR_INTERVAL')
@@ -53,7 +53,11 @@ scimmaConfFile = os.path.expanduser(o.scimmaConfFile)
 influxUrl      = iUrl
 
 print("hopBeatMon starting")
-print("SCiMMA server URL:  %s"   % scimmaUrl)
+print("SCiMMA server URL:  %s" % scimmaUrl)
+print("Hopbeat topic:      %s" % topic)
+print("Interval:           %s" % interval)
+print("Iinflux URL:        %s" % influxUrl)
+print("Influx DB:          %s" % influxDb)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
 lastBeat = 0

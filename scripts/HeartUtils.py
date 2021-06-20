@@ -49,3 +49,31 @@ def writeStats (url, db, ok, now, ktime, lb, cb, bl):
         print("============================")
         print(proc.stderr.decode().splitlines())
         print("============================")
+
+def writeCheck (url, sn, ok, now, ktime, lb, cb, bl):
+   beats = cb - lb
+   if (ok == 1):
+     prefix = "OK"
+     state  = 0
+     if (beats < 40):
+       prefix = "CRITICAL"
+       state  = 2
+     elif (beats < 55):
+       prefix = "WARNING"
+       state = 1
+     message = prefix + ": " + "beats: %d" % beats
+     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"performance_data\": [ \"bps=%d;\" ], \"check_source\": \"hopbeat_monitor\"}'" % (url, "kafka.scimma.org", sn, state, message, beats)
+   else:
+     message = "UNKNOWN: could not 
+     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"check_source\": \"hopbeat_monitor\"}'" % (url, "kafka.scimma.org", sn, state, message)          
+   proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)
+   iout = proc.stdout.decode().splitlines()
+   ierr = proc.stderr.decode().splitlines()
+   if (proc.returncode != 0):
+        print("============================")
+        print("Error talking to icinga.")
+        print("============================")
+        print(proc.stdout.decode().splitlines())
+        print("============================")
+        print(proc.stderr.decode().splitlines())
+        print("============================")

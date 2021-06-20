@@ -31,11 +31,10 @@ def getCredsString (region, secret):
   c = json.loads(cjson)
   return c["creds"]
 
-def getSecret (region, secret) {
+def getSecret (region, secret):
   cmd   = "/usr/local/bin/aws --region %s secretsmanager get-secret-value --secret-id %s" % (region, secret)
   s = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE).stdout.read().decode()
   return s
-}
 
 def writeConfig (loc, creds):
     cfh = open(loc, "w")
@@ -63,4 +62,3 @@ class ScimmaConnection:
 
     def close (self):
         self.streamHandle.close()
-

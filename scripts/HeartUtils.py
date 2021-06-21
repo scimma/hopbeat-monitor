@@ -5,6 +5,7 @@
 import subprocess
 import time
 import re
+import os
 
 def getStats (url, topic):
     command = "/usr/local/bin/kafkacat -F /root/share/kafkacat.conf -b %s -C -t %s -o -1 -e " % (url, topic)

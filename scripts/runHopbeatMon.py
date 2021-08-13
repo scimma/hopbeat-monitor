@@ -16,7 +16,7 @@ hopSecret    = "dev-gcn2hop-hopcreds"
 influxSecret = "dev-influxdb-hop-writer-creds" 
 icingaSecret = "icinga-api-creds"
 configDir    = "/root/share"
-Location     = "%s/kafkacat.conf" % configDir
+Location     = "%s/config.toml" % configDir
 hopUrl       = "dev.hop.scimma.org:9092"
 interval     = "60"
 

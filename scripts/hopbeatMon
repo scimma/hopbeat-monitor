@@ -15,6 +15,8 @@ import HeartUtils as hu
 import sys
 import os
 import time
+from hop import Stream
+import json
 
 ## Line buffer stdout and stderr
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
@@ -67,12 +69,19 @@ print("Influx DB:          %s" % influxDb)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
 lastBeat = 0
-while (True):
-     ok, now, kafkaTime, curBeat, beatlag = hu.getStats(scimmaUrl, topic)
-     if ((lastBeat > 0) or (ok == 0)):
-          hu.writeStats(influxUrl, influxDb, ok, now, kafkaTime, lastBeat, curBeat, beatlag)
-          hu.writeCheck(icingaUrl, icingaService, ok, now, kafkaTime, lastBeat, curBeat, beatlag)
-     lastBeat = curBeat
-     print("Sleeping...")
-     time.sleep(int(interval))
+stream = Stream(persist=True)
+with stream.open(scimmaUrl) as s:
+  for message in s:
+    ok       = 1
+    nowFloat = time.time()
+    now      = int(nowFloat * 10**9)
+    nowMs    = int(nowFloat * 10**6)
+    beatTime = message["timestamp"]
+    beat     = message["count"]
+    if (lastBeat > 0):
+      latency  = (nowMs - beatTime)/(10**6)
+      beatDiff = beat - lastBeat
+      hu.writeStats(influxUrl, influxDb, ok, now, latency, beatDiff)
+    lastBeat = beat
+hu.writeStats(influxUrl, influxDb, 0, now, latency, beatDiff)
 exit(0)

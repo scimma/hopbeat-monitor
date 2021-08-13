@@ -9,6 +9,7 @@ import re
 from hop import models
 from hop import publish
 from hop import io
+import os
 
 def getCreds (region, secret):
   cmd   = "/usr/local/bin/aws --region %s secretsmanager get-secret-value --secret-id %s" % (region, secret)

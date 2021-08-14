@@ -85,5 +85,5 @@ with stream.open(scimmaUrl) as s:
       hu.writeCheck(influxUrl, influxDb, ok, now, latency, beatDiff)
     lastBeat = beat
 hu.writeStats(influxUrl, influxDb, 0, now, latency, beatDiff)
-hu.writeCheck(influxUrl, influxDb, ok, now, latency, beatDiff)
+hu.writeCheck(influxUrl, influxDb, 0, now, latency, beatDiff)
 exit(0)

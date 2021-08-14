@@ -39,7 +39,7 @@ def writeCheck (url, sn, ok, now, latency, beatDiff):
        prefix = "WARNING"
        state = 1
      message = prefix + ": " + "latency: %f" % latency
-     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"performance_data\": [ \"bpm=%d;\" ], \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, state, message, beats)
+     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"performance_data\": [ \"latency=%f;\" ], \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, state, message, latency)
    else:
      message = "UNKNOWN: hop timeout"
      command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, state, message)

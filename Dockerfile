@@ -4,9 +4,9 @@
 ### Desc:   Build a container that sends a heartbeat message every 30 seconds
 ###         using the hop library.
 ###
-FROM scimma/client:0.4.0
+FROM scimma/client:0.5.3
 RUN  mkdir -p /usr/local/src
-RUN yum -y install git unzip python36-pytz
+RUN yum -y install git unzip python3-pytz.noarch python38-pytz.noarch
 RUN cd /usr/local/src && \
     curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \

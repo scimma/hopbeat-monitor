@@ -78,6 +78,7 @@ with stream.open(scimmaUrl) as s:
     nowMs    = int(nowFloat * 10**6)
     beatTime = message["timestamp"]
     beat     = message["count"]
+    printf("Received beat: %d %d %d  " % (beat, nowMs, beatTime))
     if (lastBeat > 0):
       latency  = (nowMs - beatTime)/(10**6)
       beatDiff = beat - lastBeat

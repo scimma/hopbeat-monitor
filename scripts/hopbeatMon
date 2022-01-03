@@ -71,7 +71,7 @@ print("SCiMMA config file: %s\n" % scimmaConfFile)
 lastBeat = 0
 stream = Stream(persist=True)
 with stream.open(scimmaUrl) as s:
-  for message in s:
+  for i, (message, metadata) in enumerate(s.read(batch_size=1, metadata=True)):
     ok       = 1
     nowFloat = time.time()
     now      = int(nowFloat * 10**9)

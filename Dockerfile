@@ -4,7 +4,7 @@
 ### Desc:   Build a container that sends a heartbeat message every 30 seconds
 ###         using the hop library.
 ###
-FROM scimma/client:0.5.3
+FROM scimma/client:0.7.1
 RUN  mkdir -p /usr/local/src
 RUN yum -y install git unzip python3-pytz.noarch python38-pytz.noarch
 RUN cd /usr/local/src && \

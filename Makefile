@@ -39,6 +39,9 @@ push: set-release-tags
 	docker push $(AWSREG)/$(CNT_NAME):$(MAJOR_TAG)
 	docker push $(AWSREG)/$(CNT_NAME):$(MAJOR_TAG).$(MINOR_TAG)
 	@eval "echo $$DPASS" | docker login --username $(DBUILDER) --password-stdin
+	docker tag $(CNT_IMG) $(CNT_NAME):$(RELEASE_TAG)
+	docker tag $(CNT_IMG) $(CNT_NAME):$(MAJOR_TAG)
+	docker tag $(CNT_IMG) $(CNT_NAME):$(MAJOR_TAG).$(MINOR_TAG)
 	docker push $(CNT_NAME):$(RELEASE_TAG)
 	docker push $(CNT_NAME):$(MAJOR_TAG)
 	docker push $(CNT_NAME):$(MAJOR_TAG).$(MINOR_TAG)

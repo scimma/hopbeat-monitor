@@ -38,17 +38,29 @@ if (os.environ.get('ICINGA_SECRET') is not None):
 if (os.environ.get('MONITOR_INTERVAL') is not None):
     interval = os.environ.get('MONITOR_INTERVAL')
 
+if (os.environ.get('HOP_CREDS') is not None):
+    hopCreds = u.getCredsFromString(os.environ.get('HOP_CREDS'))
+else:
+    hopCreds = u.getCreds(region, hopSecret)
+
+if (os.environ.get('INFLUX_CREDS') is not None):
+   influxCreds = os.environ.get('INFLUX_CREDS')
+else:
+   influxCreds = u.getCredsString(region, influxSecret)
+   os.environ["INFLUX_CREDS"] = influxCreds
+
+if (os.environ.get('ICINGA_CREDS') is not None):
+   icingaCreds = os.environ.get('ICINGA_CREDS')
+else:
+   icingaCreds = u.getSecret(region, icingaSecret)   
+   os.environ["ICINGA_CREDS"] = icingaCreds
+
 ## Line buffer stdout and stderr
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', buffering=1)
 
 os.system("mkdir -p %s" % configDir)
-hopCreds    = u.getCreds(region, hopSecret)
-influxCreds = u.getCredsString(region, influxSecret)
-icingaCreds = u.getSecret(region, icingaSecret)
 u.writeConfig(Location, hopCreds)
-os.environ["INFLUX_CREDS"] = influxCreds
-os.environ["ICINGA_CREDS"] = icingaCreds
 
 while True:
     print("======================================")

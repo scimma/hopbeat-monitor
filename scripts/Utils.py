@@ -11,6 +11,14 @@ from hop import publish
 from hop import io
 import os
 
+def getCredsFromString (s):
+  cm = re.match(r'^([^:]+):(.*)$', s)
+  if cm != None:
+      creds = {"user": cm.group(1), "pass": cm.group(2)}
+  else:
+      creds = None
+  return creds
+
 def getCreds (region, secret):
   cmd   = "/usr/local/bin/aws --region %s secretsmanager get-secret-value --secret-id %s" % (region, secret)
   s = json.loads(subprocess.Popen([cmd], shell=True,

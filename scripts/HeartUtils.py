@@ -7,9 +7,9 @@ import time
 import re
 import os
 
-def writeStats (url, db, ok, now, latency, beatDiff):
+def writeStats (url, db, ok, now, latency, beatDiff, beat, statsLatency, checkLatency, modifiedLatency):
     if (ok == 1):
-        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d %d\"" % (url, db, ok, latency, beatDiff, now)
+        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d,beat=%d,statsLatency=%f,checkLatency=%s,modifiedLatency %d\"" % (url, db, ok, latency, beatDiff, beat, now, statsLatency, checkLatency, modifiedLatency)
     else:
         command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d %d\"" % (url, db, ok, now)
     proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)

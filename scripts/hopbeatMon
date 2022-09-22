@@ -44,9 +44,11 @@ if (os.environ.get('INFLUX_URL') is not None):
 if (os.environ.get('INFLUX_DB') is not None):
     influxDb = os.environ.get('INFLUX_DB')
 
+icingaUrl = None
 if (os.environ.get('ICINGA_URL') is not None):
     icingaUrl = os.environ.get('ICINGA_URL')
 
+icingaService = None
 if (os.environ.get('ICINGA_SERVICE') is not None):
     icingaService = os.environ.get('ICINGA_SERVICE')
 

@@ -69,7 +69,12 @@ print("Influx DB:          %s" % influxDb)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
 lastBeat = 0
-stream = Stream(persist=True)
+stream = Stream()
+afterWriteStats = 0
+afterWriteCheck = 0
+writeStatsLatency = 0
+writeCheckLatency = 0
+modifiedLatency   = 0
 with stream.open(scimmaUrl) as s:
   for i, (message, metadata) in enumerate(s.read(batch_size=1, metadata=True)):
     ok       = 1
@@ -81,9 +86,16 @@ with stream.open(scimmaUrl) as s:
     print("Received beat: %d %d %d  " % (beat, nowMs, beatTime))
     if (lastBeat > 0):
       latency  = (nowMs - beatTime)/(10**6)
+      modifiedLatency = latency - (writeStatsLatency + writeCheckLatency)
       beatDiff = beat - lastBeat
-      hu.writeStats(influxUrl, influxDb, ok, now, latency, beatDiff)
+
+      hu.writeStats(influxUrl, influxDb, ok, now, latency, beatDiff, beat, writeStatsLatency, writeCheckLatency, modifiedLatency)
+      afterWriteStats   = time.time()
+      writeStatsLatency = afterWriteStats - nowFloat
+
       hu.writeCheck(icingaUrl, icingaService, ok, now, latency, beatDiff)
+      afterWriteCheck   = time.time()
+      writeCheckLatency = afterWriteCheck - afterWriteStats
     lastBeat = beat
 hu.writeStats(influxUrl, influxDb, 0, now, latency, beatDiff)
 hu.writeCheck(icingaUrl, icingaService, 0, now, latency, beatDiff)

@@ -74,12 +74,14 @@ statsQueue = Queue()
 checkQueue = Queue()
 
 statsP = Process(target=hu.statsWriter, args=(statsQueue, influxUrl, influxDb))
+statsP.daemon = True
 statsP.start()
 checkP = Process(target=hu.checkWriter, args=(checkQueue, icingaUrl, icingaService))
+checkP.daemon = True
 checkP.start()
 
 lastBeat = 0
-stream = Stream()
+stream = Stream(persist=True)
 afterWriteStats = 0
 afterWriteCheck = 0
 writeStatsLatency = 0
@@ -103,10 +105,12 @@ with stream.open(scimmaUrl) as s:
       cd = {'end': False, 'ok': ok, 'now': now, 'latency': latency, 'beatDiff': beatDiff}
       checkQueue.put(cd)
     lastBeat = beat
-sd = {'end': True, 'ok': 0, 'now': now, 'latency': latency, 'beatDiff': beatDiff, 'beat': beat }
+
+print("hopbeatMon main loop complete.")
+sd = {'end': True, 'ok': 0, 'now': now, 'latency': 0, 'beatDiff': 0, 'beat': 0 }
 statsQueue.put(sd)
-cd = {'end': True, 'ok': 0, 'now': now, 'latency': latency, 'beatDiff': beatDiff}
+cd = {'end': True, 'ok': 0, 'now': now, 'latency': 0, 'beatDiff': 0}
 checkQueue.put(cd)
 statsP.join()
 checkP.join()
-exit(0)
+sys.exit(0)

@@ -6,10 +6,31 @@ import subprocess
 import time
 import re
 import os
+from multiprocessing import Process, Queue
 
-def writeStats (url, db, ok, now, latency, beatDiff, beat, statsLatency, checkLatency, modifiedLatency):
+##
+## For multiprocess. Read from a queue and send checks to InfluxDB.
+##
+def statsWriter (q, url, db):
+    while True:
+        d = q.get()
+        writeStats(url, db, d['ok'], d['now'], d['latency'], d['beatDiff'], d['beat'])
+        if d['end']:
+            exit()
+
+##
+## For multiprocess. Read from a queue and send checks to Icinga.
+##
+def checkWriter (q, url, sn):
+    while True:
+        d = q.get()
+        writeCheck(url, sn, d['ok'], d['now'], d['latency'], d['beatDiff'])
+        if d['end']:
+            exit()
+
+def writeStats (url, db, ok, now, latency, beatDiff, beat):
     if (ok == 1):
-        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d,beat=%d,statsLatency=%f,checkLatency=%f,modifiedLatency=%f %d\"" % (url, db, ok, latency, beatDiff, beat, statsLatency, checkLatency, modifiedLatency, now)
+        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d,beat=%d %d\"" % (url, db, ok, latency, beatDiff, beat, statsLatency, checkLatency, modifiedLatency, now)
     else:
         command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d %d\"" % (url, db, ok, now)
     proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)

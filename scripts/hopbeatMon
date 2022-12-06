@@ -81,7 +81,7 @@ checkP.daemon = True
 checkP.start()
 
 lastBeat = 0
-stream = Stream(until_eos=True)
+stream = Stream(until_eos=False)
 afterWriteStats = 0
 afterWriteCheck = 0
 writeStatsLatency = 0

@@ -17,7 +17,7 @@ import os
 import time
 from hop import Stream
 import json
-
+from multiprocessing import Process, Queue
 ## Line buffer stdout and stderr
 sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', buffering=1)
 sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', buffering=1)
@@ -70,8 +70,18 @@ print("Iinflux URL:        %s" % influxUrl)
 print("Influx DB:          %s" % influxDb)
 print("SCiMMA config file: %s\n" % scimmaConfFile)
 
+statsQueue = Queue()
+checkQueue = Queue()
+
+statsP = Process(target=hu.statsWriter, args=(statsQueue, influxUrl, influxDb))
+statsP.daemon = True
+statsP.start()
+checkP = Process(target=hu.checkWriter, args=(checkQueue, icingaUrl, icingaService))
+checkP.daemon = True
+checkP.start()
+
 lastBeat = 0
-stream = Stream()
+stream = Stream(until_eos=True)
 afterWriteStats = 0
 afterWriteCheck = 0
 writeStatsLatency = 0
@@ -90,15 +100,17 @@ with stream.open(scimmaUrl) as s:
       latency  = (nowMs - beatTime)/(10**6)
       modifiedLatency = latency - (writeStatsLatency + writeCheckLatency)
       beatDiff = beat - lastBeat
-
-      hu.writeStats(influxUrl, influxDb, ok, now, latency, beatDiff, beat, writeStatsLatency, writeCheckLatency, modifiedLatency)
-      afterWriteStats   = time.time()
-      writeStatsLatency = afterWriteStats - nowFloat
-
-      hu.writeCheck(icingaUrl, icingaService, ok, now, latency, beatDiff)
-      afterWriteCheck   = time.time()
-      writeCheckLatency = afterWriteCheck - afterWriteStats
+      sd = {'end': False, 'ok': ok, 'now': now, 'latency': latency, 'beatDiff': beatDiff, 'beat': beat }
+      statsQueue.put(sd)
+      cd = {'end': False, 'ok': ok, 'now': now, 'latency': latency, 'beatDiff': beatDiff}
+      checkQueue.put(cd)
     lastBeat = beat
-hu.writeStats(influxUrl, influxDb, 0, now, latency, beatDiff)
-hu.writeCheck(icingaUrl, icingaService, 0, now, latency, beatDiff)
-exit(0)
+
+print("hopbeatMon main loop complete.")
+sd = {'end': True, 'ok': 0, 'now': now, 'latency': 0, 'beatDiff': 0, 'beat': 0 }
+statsQueue.put(sd)
+cd = {'end': True, 'ok': 0, 'now': now, 'latency': 0, 'beatDiff': 0}
+checkQueue.put(cd)
+statsP.join()
+checkP.join()
+sys.exit(0)

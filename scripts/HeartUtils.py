@@ -31,9 +31,9 @@ def checkWriter (q, url, sn):
 
 def writeStats (url, db, ok, now, latency, beatDiff, beat):
     if (ok == 1):
-        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d,beat=%d %d\"" % (url, db, ok, latency, beatDiff, beat, now)
+        command = "curl --connect-timeout 10 -m 20  -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d,latency=%f,beatdiff=%d,beat=%d %d\"" % (url, db, ok, latency, beatDiff, beat, now)
     else:
-        command = "curl -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d %d\"" % (url, db, ok, now)
+        command = "curl --connect-timeout 10 -m 20  -sk -XPOST '%s/write?db=%s' -u $INFLUX_CREDS --data-binary \"hearbeat ok=%d %d\"" % (url, db, ok, now)
     proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)
     iout = proc.stdout.decode().splitlines()
     ierr = proc.stderr.decode().splitlines()
@@ -61,10 +61,10 @@ def writeCheck (url, sn, ok, now, latency, beatDiff):
        prefix = "WARNING"
        state = 1
      message = prefix + ": " + "latency: %f" % latency
-     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"performance_data\": [ \"latency=%f;\" ], \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, state, message, latency)
+     command = "curl --connect-timeout 10 -m 20 -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"performance_data\": [ \"latency=%f;\" ], \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, state, message, latency)
    else:
      message = "UNKNOWN: hop timeout"
-     command = "curl -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, 3, message)
+     command = "curl --connect-timeout 10 -m 20 -sk -XPOST -u $ICINGA_CREDS -H  'Accept: application/json' -H 'Content-type: application/json'  '%s' -d '{\"type\":\"Service\", \"filter\":\"host.name==\\\"%s\\\" && service.name==\\\"%s\\\"\", \"exit_status\": %d, \"plugin_output\": \"%s\", \"check_source\": \"hopbeat_monitor\"}'" % (url, check_host, sn, 3, message)
    proc = subprocess.run([command], shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=20)
    iout = proc.stdout.decode().splitlines()
    ierr = proc.stderr.decode().splitlines()

@@ -8,6 +8,7 @@ import re
 import os
 from multiprocessing import Process, Queue
 import sys
+import traceback
 
 ##
 ## For multiprocess. Read from a queue and send checks to InfluxDB.
@@ -15,7 +16,11 @@ import sys
 def statsWriter (q, url, db):
     while True:
         d = q.get()
-        writeStats(url, db, d['ok'], d['now'], d['latency'], d['beatDiff'], d['beat'])
+        try:
+            writeStats(url, db, d['ok'], d['now'], d['latency'], d['beatDiff'], d['beat'])
+        except Exception as e:
+            print("writeStats failed:\n", e)
+            traceback.print_exc()
         if d['end']:
             sys.exit(0)
 
@@ -25,7 +30,11 @@ def statsWriter (q, url, db):
 def checkWriter (q, url, sn):
     while True:
         d = q.get()
-        writeCheck(url, sn, d['ok'], d['now'], d['latency'], d['beatDiff'])
+        try:
+            writeCheck(url, sn, d['ok'], d['now'], d['latency'], d['beatDiff'])
+        except:
+            print("writeCheck failed:\n", e)
+            traceback.print_exc()
         if d['end']:
             sys.exit(0)
 
@@ -76,4 +85,3 @@ def writeCheck (url, sn, ok, now, latency, beatDiff):
         print("============================")
         print(proc.stderr.decode().splitlines())
         print("============================")
-
